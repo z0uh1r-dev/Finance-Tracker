@@ -6,6 +6,10 @@ var app = angular.module('FinanceTrackerApp', [])
                         return $http.get('/search_stocks.json?stock=' + symbol);
                       }
 
+                      stockApi.addStockToPortfolio = function(symbol) {
+                        return $http.post('/user_stocks.json?stock=' + symbol);
+                      }
+
                       return stockApi;
                     }])
                     .controller('stocksController', ['$scope', 'stockService', function($scope , stockService) {
@@ -18,6 +22,7 @@ var app = angular.module('FinanceTrackerApp', [])
                             .then(function(res) {
                               $scope.stock = {}
                               $scope.stock.error = null;
+                              $scope.stock.message = null;
                               $scope.stock.symbol = res.data.ticker;
                               $scope.stock.name = res.data.name;
                               $scope.stock.last_price = res.data.last_price;
@@ -36,6 +41,24 @@ var app = angular.module('FinanceTrackerApp', [])
                           $scope.stock = {
                             symbol: {}
                           }
+                        }
+                      }
+
+                      $scope.add = function() {
+                        if($scope.stock != undefined && $scope.stock. symbol != '') {
+                          stockService.addStockToPortfolio($scope.stock.symbol)
+                            .then(function(res){
+                              $scope.stock.error = null;
+                              $scope.stock.message = res.data.response;
+                              $scope.stock.name = null;
+                              $scope.ticker = null;
+                              $('#stock-list').load('my_portfolio.js');
+                            }, function(err) {
+                              $scope.stock = {};
+                              $scope.stock.error = "Stock cannot be added.";
+                            })
+                        } else {
+                          $scope.stock.error = "Stock cannot be added.";
                         }
                       }
                     }]);
