@@ -17,11 +17,11 @@ var app = angular.module('FinanceTrackerApp', [])
                           stockService.searchStocks($scope.ticker)
                             .then(function(res) {
                               $scope.stock = {}
-                              $scope.stock,error = null;
-                              $scope.stock,symbol = res.data.ticker;
-                              $scope.stock,name = res.data.name;
-                              $scope.stock,last_price = res.data.last_price;
-                              $scope.stock,can_be_added = res.data.can_be_added;
+                              $scope.stock.error = null;
+                              $scope.stock.symbol = res.data.ticker;
+                              $scope.stock.name = res.data.name;
+                              $scope.stock.last_price = res.data.last_price;
+                              $scope.stock.can_be_added = res.data.can_be_added;
                             }, function(err) {
                               $scope.stock = {}
                               $scope.stock.error = err.data.response
