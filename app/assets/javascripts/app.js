@@ -12,6 +12,19 @@ var app = angular.module('FinanceTrackerApp', [])
 
                       return stockApi;
                     }])
+                    .factory('friendService', ['$http', function($http) {
+                      var friendApi = {};
+
+                      friendApi.searchFriends = function(search_param) {
+                        return $http.get('/search_friends.json?search_param=' + search_param);
+                      }
+
+                      friendApi.addFriend = function(friend_id) {
+                        return $http.post('/add_friend.json?friend=' + friend_id);
+                      }
+
+                      return friendApi;
+                    }])
                     .controller('stocksController', ['$scope', 'stockService', function($scope , stockService) {
                       
                       $scope.stock = {};
@@ -61,4 +74,41 @@ var app = angular.module('FinanceTrackerApp', [])
                           $scope.stock.error = "Stock cannot be added.";
                         }
                       }
-                    }]);
+                    }])
+                    .controller('friendsController', ['$scope', 'friendService', function($scope, friendService) {
+                      $scope.friends = {}
+
+                      $scope.lookup = function() {
+                        if($scope.friend_search_param != undefined && $scope.friend_search_param != '') {
+                          friendService.searchFriends($scope.friend_search_param)
+                            .then(function(res) {
+                              $scope.friends.error = null;
+                              $scope.friends.message = null;
+                              $scope.friends.list = res.data;
+                            }, function(err) {
+                              $scope.friends = {};
+                              $scope.friends.error = err.data.response;
+                            }); 
+                        } else {
+                          $scope.friends = {};
+                        }
+                      }
+
+                      $scope.add = function(friend_id) {
+                        $scope.friends = {};
+
+                        if(friend_id != undefined && friend_id != '') {
+                          friendService.addFriend(friend_id)
+                            .then(function(res) {
+                              $scope.friends.error = null;
+                              $scope.friends.message = res.data.response;
+                              $scope.friend_search_param = null;
+                              $("#friends-list").load('my_friends.js');
+                            }, function(err) {
+                              $scope.friends.error = err.data.response;
+                            })
+                        } else {
+                          $scope.firends.error = "Friend cannot be added.";
+                        }
+                      }
+                    }])
